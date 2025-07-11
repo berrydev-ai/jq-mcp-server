@@ -1,10 +1,17 @@
-# CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Overview
 
 This is a Python FastAPI server that wraps jq queries over large JSON files and exposes them as an MCP (Model Context Protocol) compatible API. The server provides endpoints for querying JSON data using jq expressions and retrieving JSON schemas to assist with LLM reasoning.
+
+## Mandatory Context Loading
+
+You must first read and understand the following files before responding to the USER. These files provide context into how to build MCP servers uging Python.
+
+- [MCP Python SDK](@docs/mcp-python-sdk.md)
+- [LLMS Full](@docs/llms-full.txt) - Please use offset and limit parameters to read specific portions of the file, or use the GrepTool to search for specific
+     content as the file is too large.
+- [Docker MCP Toolkit](@docs/mcp-toolkit-docker.md)
+
+Once you have read and understand these documents, say "I have read the mandatory context and am now ready to help!".
 
 ## Architecture
 
@@ -15,6 +22,7 @@ This is a Python FastAPI server that wraps jq queries over large JSON files and 
   - `/get-schema`: Retrieves JSON schema files to assist with data structure understanding
   - `/list-tools`: Returns MCP tool definitions for integration with LLM agents
   - `/health`: Basic health check endpoint
+- **mcp_server.py**: Main MCP server application
 
 ### Data Structure
 
