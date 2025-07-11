@@ -1,0 +1,31 @@
+# Ignore Python cache and artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+dist/
+build/
+
+# Ignore virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Ignore git and local configs
+.git/
+.venv/.gitignore
+.vscode/
+.idea/
+
+# Ignore local env files
+.env
+.env.*
+
+# __local data or mounts__
+/data/
+# Allow example file for documentation
+!/data/example.json
+
+# Ignore macOS junk
+.DS_Store
