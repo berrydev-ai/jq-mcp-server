@@ -257,7 +257,7 @@ The easiest way to use the Docker image is to pull it from GitHub Container Regi
 # Pull the latest image
 docker pull ghcr.io/berrydev-ai/jq-mcp-server:latest
 
-# Run the container
+# Run the container (mount your local data directory)
 docker run -it --rm \
   -v $(pwd)/data:/app/data:ro \
   -e DATA_PATH=/app/data \
@@ -274,7 +274,7 @@ Build and run the MCP server as a Docker container:
 # Build the Docker image
 docker build -t jq-mcp-server .
 
-# Run the container
+# Run the container (mount your local data directory)
 docker run -it --rm \
   -v $(pwd)/data:/app/data:ro \
   -e DATA_PATH=/app/data \

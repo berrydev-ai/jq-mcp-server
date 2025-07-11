@@ -15,7 +15,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY mcp_server.py .
-COPY data/ ./data/
+
+# Create data directory (files will be mounted via volume)
+RUN mkdir -p ./data
 
 # Set default environment variables
 ENV DATA_PATH=/app/data
