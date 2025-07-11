@@ -1,32 +1,69 @@
-# Ignore Python cache and artifacts
-__pycache__/
-*.py[cod]
-*.egg-info/
-*.egg
-dist/
-build/
+# Git
+.git
+.gitignore
+.gitattributes
 
-# Ignore virtual environments
-.venv/
+# GitHub
+.github
+
+# Documentation
+README.md
+docs/
+*.md
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env
+pip-log.txt
+pip-delete-this-directory.txt
+.tox
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git
+.mypy_cache
+.pytest_cache
+.hypothesis
+
+# Virtual environments
+.env
+.venv
+env/
 venv/
 ENV/
-env/
+env.bak/
+venv.bak/
 
-# Ignore git and local configs
-.git/
-.venv/.gitignore
+# IDE
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
 
-# Ignore local env files
-.env
-.env.*
-
-# __local data or mounts__
-/data/
-# Allow example file for documentation
-!/data/example.json
-!/data/example-schema.json
-
-# Ignore macOS junk
+# OS
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Development scripts
+dev.sh
+run.sh
+
+# Docker
+docker-compose.yml
+Dockerfile
+.dockerignore
+EOF < /dev/null

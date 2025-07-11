@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  jq-mcp-server:
+    # Use pre-built image from GitHub Container Registry
+    image: ghcr.io/berrydev-ai/jq-mcp-server:latest
+    # Uncomment below to build locally instead
+    # build: .
+    container_name: jq-mcp-server
+    environment:
+      - DATA_PATH=/app/data
+      - JSON_FILE_PATH=orca-schema.json
+      - JSON_SCHEMA_FILE_PATH=orca-json-schema.json
+    volumes:
+      # Mount your local data directory to container
+      - ./data:/app/data:ro
+    stdin_open: true
+    tty: true
+    # For MCP Toolkit integration
+    labels:
+      - "mcp.server=true"
+      - "mcp.name=jq-mcp-server"
+      - "mcp.description=Query JSON files using jq expressions"
+      - "mcp.tools=query_json,get_jsonschema"

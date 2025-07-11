@@ -245,6 +245,166 @@ The repository includes example files in the `data/` directory:
 
 ---
 
+## Docker & MCP Toolkit Integration
+
+### Docker Build and Run
+
+#### Using Pre-built Images from GitHub Container Registry
+
+The easiest way to use the Docker image is to pull it from GitHub Container Registry:
+
+```bash
+# Pull the latest image
+docker pull ghcr.io/berrydev-ai/jq-mcp-server:latest
+
+# Run the container
+docker run -it --rm \
+  -v $(pwd)/data:/app/data:ro \
+  -e DATA_PATH=/app/data \
+  -e JSON_FILE_PATH=orca-schema.json \
+  -e JSON_SCHEMA_FILE_PATH=orca-json-schema.json \
+  ghcr.io/berrydev-ai/jq-mcp-server:latest
+```
+
+#### Building Locally
+
+Build and run the MCP server as a Docker container:
+
+```bash
+# Build the Docker image
+docker build -t jq-mcp-server .
+
+# Run the container
+docker run -it --rm \
+  -v $(pwd)/data:/app/data:ro \
+  -e DATA_PATH=/app/data \
+  -e JSON_FILE_PATH=orca-schema.json \
+  -e JSON_SCHEMA_FILE_PATH=orca-json-schema.json \
+  jq-mcp-server
+```
+
+#### Available Tags
+
+- `latest` - Latest stable release from main branch
+- `main` - Latest development build from main branch
+- `v1.0.0` - Specific version releases
+- `sha-<commit>` - Specific commit builds
+
+#### Multi-Platform Support
+
+Images are built for multiple architectures:
+- `linux/amd64` (Intel/AMD 64-bit)
+- `linux/arm64` (ARM 64-bit, including Apple Silicon)
+
+### Using Docker Compose
+
+For easier development and deployment:
+
+```bash
+# Run with docker-compose (uses pre-built image)
+docker-compose up
+
+# Run in detached mode
+docker-compose up -d
+
+# Stop the service
+docker-compose down
+```
+
+Update `docker-compose.yml` to use the GitHub Container Registry image:
+
+```yaml
+version: '3.8'
+services:
+  jq-mcp-server:
+    image: ghcr.io/berrydev-ai/jq-mcp-server:latest
+    # ... rest of configuration
+```
+
+### GitHub Actions CI/CD
+
+This repository includes automated Docker image building and publishing:
+
+- **Automatic builds** on every push to main branch
+- **Multi-platform builds** (linux/amd64, linux/arm64)
+- **Semantic versioning** support with git tags
+- **Security attestation** for build provenance
+- **Cached builds** for faster CI/CD
+
+#### Creating Releases
+
+To create a new release:
+
+```bash
+# Tag and push a new version
+git tag v1.0.0
+git push origin v1.0.0
+
+# GitHub Actions will automatically build and publish:
+# - ghcr.io/berrydev-ai/jq-mcp-server:v1.0.0
+# - ghcr.io/berrydev-ai/jq-mcp-server:v1.0
+# - ghcr.io/berrydev-ai/jq-mcp-server:v1
+# - ghcr.io/berrydev-ai/jq-mcp-server:latest
+```
+
+### Docker MCP Toolkit Integration
+
+This server is compatible with the **Docker MCP Toolkit** for seamless integration with Claude Desktop, VS Code, and other MCP clients.
+
+#### Setup with Docker MCP Toolkit
+
+1. **Enable Docker MCP Toolkit** in Docker Desktop:
+   - Open Docker Desktop settings
+   - Select **Beta features**
+   - Enable **Docker MCP Toolkit**
+   - Apply changes
+
+2. **Build and register your MCP server**:
+   ```bash
+   # Build the image with MCP toolkit labels
+   docker build -t jq-mcp-server .
+   
+   # Register with MCP toolkit (if supported)
+   docker mcp server register jq-mcp-server
+   ```
+
+3. **Connect MCP clients**:
+   - **Claude Desktop**: Use the MCP Toolkit **Clients** tab to connect Claude Desktop
+   - **VS Code**: Add MCP configuration to enable the toolkit gateway
+   - **Other clients**: Connect through the MCP Toolkit gateway
+
+#### MCP Toolkit Benefits
+
+- **Zero manual setup**: No dependency management or server configuration
+- **Cross-client compatibility**: Works with Claude Desktop, VS Code, Continue.dev, and more
+- **Secure defaults**: Resource limits and filesystem access controls
+- **Tool discovery**: Browse and manage MCP servers from Docker Desktop
+
+#### Client Configuration for MCP Toolkit
+
+**For VS Code with MCP Toolkit:**
+```json
+{
+  "mcp": {
+    "servers": {
+      "MCP_DOCKER": {
+        "command": "docker",
+        "args": ["mcp", "gateway", "run"],
+        "type": "stdio"
+      }
+    }
+  }
+}
+```
+
+**For Claude Desktop via MCP Toolkit:**
+1. Install the server in Docker MCP Toolkit
+2. Connect Claude Desktop as a client
+3. Restart Claude Desktop
+4. The jq tools will be available automatically
+
+---
+
 ## License
 
 MIT License.  
