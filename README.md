@@ -1,151 +1,109 @@
 # jq MCP Server
 
-A lightweight API server that wraps `jq` queries over large JSON files and exposes them as an [MCP-compatible](https://github.com/OpenPipe/MCP) API.  
-Now supports **optional JSON Schema retrieval** for enhanced LLM agent context!
+A Python MCP (Model Context Protocol) server that wraps `jq` queries over large JSON files.  
+Provides MCP tools for **JSON querying** and **JSON Schema retrieval** for enhanced LLM agent context!
 
 ---
 
 ## Features
 
 - ✅ Query huge JSON files using `jq`
-- ✅ Retrieve associated JSON Schema files via API
-- ✅ REST API endpoints
-- ✅ MCP tool listing for integration with LLM agents
-- ✅ Dockerized and portable
+- ✅ Retrieve associated JSON Schema files via MCP tools
+- ✅ Native MCP server integration with Claude Desktop, VS Code, and other MCP clients
+- ✅ Lightweight and portable
 
 ---
 
-## Endpoints
+## MCP Tools
 
-- `POST /query-json` — Run jq query on a JSON file  
-- `POST /get-schema` — Retrieve a JSON Schema file to assist LLM reasoning  
-- `GET /list-tools` — List available MCP tools for agent integration  
-- `GET /health` — Simple health check
+- `query_json` — Run jq query on a JSON file  
+- `get_jsonschema` — Retrieve a JSON Schema file to assist LLM reasoning
 
 ---
 
 ## Getting Started
 
-### Running on Mac/Linux
+### Installation & Setup
 
 1. **Clone the repo:**
     ```bash
     git clone https://github.com/berrydev-ai/jq-mcp-server.git
     cd jq-mcp-server
     ```
-2. **Build the Docker image:**
-    ```bash
-    make build
-    ```
-3. **Run the server (mount your data directory):**
-    ```bash
-    make run DATA_PATH=/absolute/path/to/json/files
-    ```
-    Or with specific file paths:
-    ```bash
-    make run DATA_PATH=/absolute/path/to/json/files \
-              JSON_FILE_PATH=/absolute/path/to/json/files/main.json \
-              JSON_SCHEMA_FILE_PATH=/absolute/path/to/json/files/schema.json
-    ```
-    Or using Docker directly:
-    ```bash
-    docker run -p 8000:8000 -v /absolute/path/to/json/files:/data jq-mcp-server
-    ```
-    Replace `/absolute/path/to/json/files` with your own path.
 
-4. **Test with curl:**
+2. **Install dependencies:**
     ```bash
-    curl -X POST http://localhost:8000/query-json \
-      -H "Content-Type: application/json" \
-      -d '{"filePath": "/data/largefile.json", "query": ".store.book[].title"}'
+    pip install -r requirements.txt
+    ```
+
+3. **Install jq (if not already installed):**
+    ```bash
+    # On macOS
+    brew install jq
+    
+    # On Ubuntu/Debian
+    sudo apt-get install jq
+    
+    # On other systems, see: https://jqlang.github.io/jq/download/
+    ```
+
+4. **Run the MCP server:**
+    ```bash
+    python mcp_server.py
+    ```
+    
+    Or with environment variables:
+    ```bash
+    DATA_PATH=/path/to/data JSON_FILE_PATH=main.json python mcp_server.py
     ```
 
 ---
 
-### Running on Windows
+### Setup on Windows
 
 1. **Open PowerShell** and navigate to your repo:
     ```powershell
     cd C:\Users\YourName\github.com\berrydev-ai\jq-mcp-server
     ```
-2. **Build the Docker image:**
+
+2. **Install dependencies:**
     ```powershell
-    make build
-    ```
-3. **Run the server (adjust data path):**
-    ```powershell
-    make run DATA_PATH=C:/Users/YourName/data
-    ```
-    Or with specific file paths:
-    ```powershell
-    make run DATA_PATH=C:/Users/YourName/data `
-              JSON_FILE_PATH=C:/Users/YourName/data/main.json `
-              JSON_SCHEMA_FILE_PATH=C:/Users/YourName/data/schema.json
-    ```
-    Or using Docker directly:
-    ```powershell
-    docker run -p 8000:8000 -v C:/Users/YourName/data:/data jq-mcp-server
-    ```
-    *(Use forward slashes or double-backslashes in the path)*
-
-4. **Test with curl:**
-    ```powershell
-    curl -X POST http://localhost:8000/query-json `
-      -H "Content-Type: application/json" `
-      -d '{"filePath": "/data/largefile.json", "query": ".store.book[].title"}'
-    ```
-
----
-
-## Example Requests
-
-**Query a JSON file:**
-```bash
-curl -X POST http://localhost:8000/query-json \
-  -H "Content-Type: application/json" \
-  -d '{"filePath": "/data/largefile.json", "query": ".store.book[].title"}'
-```
-
-**Query using environment variable (when JSON_FILE_PATH is set):**
-```bash
-curl -X POST http://localhost:8000/query-json \
-  -H "Content-Type: application/json" \
-  -d '{"query": ".store.book[].title"}'
-```
-
-**Retrieve a JSON Schema:**
-```bash
-curl -X POST http://localhost:8000/get-schema \
-  -H "Content-Type: application/json" \
-  -d '{"schemaPath": "/data/schema.json"}'
-```
-
-**Retrieve schema using environment variable (when JSON_SCHEMA_FILE_PATH is set):**
-```bash
-curl -X POST http://localhost:8000/get-schema \
-  -H "Content-Type: application/json" \
-  -d '{}'
-```
-
-**List available tools (for agent/LLM integration):**
-```bash
-curl http://localhost:8000/list-tools
-```
-
----
-
-## Claude Desktop & Agent Integration
-
-### With Claude Desktop (MCP Server)
-
-**Direct Claude Desktop integration via MCP server!**
-
-1. **Install MCP dependencies:**
-    ```bash
     pip install -r requirements.txt
     ```
 
-2. **Configure Claude Desktop** by adding to your `claude_desktop_config.json`:
+3. **Install jq:**
+    - Download jq from https://jqlang.github.io/jq/download/
+    - Or use chocolatey: `choco install jq`
+    - Or use scoop: `scoop install jq`
+
+4. **Run the MCP server:**
+    ```powershell
+    python mcp_server.py
+    ```
+    
+    Or with environment variables:
+    ```powershell
+    $env:DATA_PATH="C:/Users/YourName/data"; $env:JSON_FILE_PATH="main.json"; python mcp_server.py
+    ```
+
+---
+
+## Usage with MCP Clients
+
+Once the server is running, it can be used with any MCP-compatible client. The server provides two tools:
+
+- **`query_json`**: Run jq queries against JSON files
+- **`get_jsonschema`**: Retrieve JSON schema files for better LLM understanding
+
+When environment variables are configured, file paths become optional in tool calls.
+
+---
+
+## Claude Desktop Integration
+
+**Direct Claude Desktop integration via MCP server!**
+
+1. **Configure Claude Desktop** by adding to your `claude_desktop_config.json`:
     ```json
     {
       "mcpServers": {
@@ -168,32 +126,25 @@ curl http://localhost:8000/list-tools
     - `JSON_FILE_PATH` and `JSON_SCHEMA_FILE_PATH` use relative paths (relative to `DATA_PATH`)
     - With this configuration, file paths become optional in tool calls - the server will use the configured defaults
 
-3. **Restart Claude Desktop** - The jq tools will now be available directly in Claude Desktop!
+2. **Restart Claude Desktop** - The jq tools will now be available directly in Claude Desktop!
 
-4. **Usage in Claude Desktop:**
+3. **Usage in Claude Desktop:**
    - **Query JSON data:** Use the `query_json` tool with just your jq expression (file path is optional)
    - **Get schema:** Use the `get_jsonschema` tool without specifying a path (uses configured default)
    - **Override defaults:** You can still provide file paths in tool calls to use different files
 
-### With Claude Desktop (HTTP API - Legacy)
-
-> **Note: The HTTP API method is now deprecated. Use the MCP server above for direct integration.**
-
-- **Manual workflow:**  
-    1. Query your JSON or schema using the above API (e.g., via curl or Postman).
-    2. Copy the result.
-    3. Paste the result into Claude Desktop as context.
-
 ---
 
-### With AI Agents (CrewAI, OpenPipe, LM Studio, etc.)
+## Other MCP Clients
 
-- Point your agent’s tool discovery/config at:  
-    `http://localhost:8000/list-tools`
-- Your agent can then:
-    - Query large JSON data
-    - Retrieve schemas to help generate valid jq expressions
-    - Combine this with LLM-powered workflows
+This server works with any MCP-compatible client including:
+- VS Code with GitHub Copilot
+- Continue.dev
+- Cursor
+- Cline
+- And many others (see MCP client documentation)
+
+Each client may have different configuration methods, but all can use the MCP stdio transport that this server provides.
 
 ---
 
@@ -207,26 +158,6 @@ You can configure the server using environment variables to specify default file
 
 ### Using Environment Variables
 
-**With Docker (absolute paths):**
-```bash
-docker run -p 8000:8000 \
-  -e DATA_PATH=/data \
-  -e JSON_FILE_PATH=/data/large-file.json \
-  -e JSON_SCHEMA_FILE_PATH=/data/schema.json \
-  -v /absolute/path/to/json/files:/data \
-  jq-mcp-server
-```
-
-**With Docker (relative paths):**
-```bash
-docker run -p 8000:8000 \
-  -e DATA_PATH=/data \
-  -e JSON_FILE_PATH=large-file.json \
-  -e JSON_SCHEMA_FILE_PATH=schema.json \
-  -v /absolute/path/to/json/files:/data \
-  jq-mcp-server
-```
-
 **With local development:**
 ```bash
 export DATA_PATH=/path/to/your/data
@@ -235,72 +166,76 @@ export JSON_SCHEMA_FILE_PATH=schema.json  # relative to DATA_PATH
 python mcp_server.py
 ```
 
-When environment variables are set, you can use relative paths or empty strings in your API calls, and the server will automatically resolve them using the configured paths.
+When environment variables are set, you can use relative paths or empty strings in your tool calls, and the server will automatically resolve them using the configured paths.
 
 **Parameter Behavior:**
-- `filePath` parameter becomes **optional** when `JSON_FILE_PATH` is set
-- `schemaPath` parameter becomes **optional** when `JSON_SCHEMA_FILE_PATH` is set
+- `file_path` parameter becomes **optional** when `JSON_FILE_PATH` is set
+- `schema_path` parameter becomes **optional** when `JSON_SCHEMA_FILE_PATH` is set
 - If environment variables are not set, the respective parameters are **required**
 
 ---
 
 ## Security & Usage Notes
 
-- **Only use locally or behind a secure firewall!** The API executes jq on any file in the mounted directory.
-- Always mount your data directory as `/data`, and reference files in API calls as `/data/yourfile.json` or `/data/schema.json`.
+- **Only use locally or behind a secure firewall!** The server executes jq on any file in the configured directories.
+- Ensure proper file path validation and access controls for your data files.
 
 ---
 
-## MCP Tool List Output (example)
+## MCP Tools Available
 
-```json
-{
-  "tools": [
-    {
-      "name": "query-json",
-      "description": "Query JSON data using jq expressions",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "filePath": {"type": "string"},
-          "query": {"type": "string"}
-        },
-        "required": ["filePath", "query"]
-      }
-    },
-    {
-      "name": "get-jsonschema",
-      "description": "Retrieve the JSON Schema associated with a data file (optional, assists LLM reasoning)",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "schemaPath": {"type": "string"}
-        },
-        "required": ["schemaPath"]
-      }
-    }
-  ]
-}
-```
+- **`query_json`**: Query JSON data using jq expressions
+  - Parameters: `file_path` (optional if JSON_FILE_PATH is set), `query` (required)
+  - Returns: Query result, execution duration, and any errors
+
+- **`get_jsonschema`**: Retrieve JSON Schema files
+  - Parameters: `schema_path` (optional if JSON_SCHEMA_FILE_PATH is set) 
+  - Returns: Schema content, execution duration, and any errors
 
 ---
 
 ## Development
 
-- Python 3.12, FastAPI, Docker
-- All endpoints are defined in `server.py`
-- Easy to extend with new tools
+- Python 3.12+ with MCP Python SDK
+- All tools are defined in `mcp_server.py` 
+- Easy to extend with new MCP tools
 
 ### Local Development Scripts
 
-- **run.sh**: Runs the HTTP server locally with virtual environment activation
-- **dev.sh**: Runs the HTTP server in development mode with auto-reload
-- **mcp_server.py**: MCP server for direct Claude Desktop integration
+The repository includes convenient shell scripts for development:
 
-### Makefile Commands
+- **run.sh**: Runs the MCP server locally with virtual environment activation
+- **dev.sh**: Development script with auto-reload (if needed)
+- **mcp_server.py**: Main MCP server application
 
-- `make build`: Build the Docker image
-- `make run`: Run the Docker container (use `DATA_PATH` to specify data directory)
+#### Using Development Scripts
+
+Both scripts automatically handle environment variable loading and virtual environment activation:
+
+```bash
+# Run the server in production mode
+./run.sh
+
+# Run the server in development mode
+./dev.sh
+```
+
+**Script Features:**
+- Automatically loads `.env` file if present
+- Sets default environment variables if not configured:
+  - `DATA_PATH` defaults to `./data`
+  - `JSON_FILE_PATH` defaults to `orca-schema.json`
+  - `JSON_SCHEMA_FILE_PATH` defaults to `orca-json-schema.json`
+- Activates virtual environment from `.venv/bin/activate`
+- Runs the MCP server with proper environment setup
+
+**Environment File Setup:**
+Create a `.env` file in the project root to customize your development environment:
+```bash
+DATA_PATH=/path/to/your/data
+JSON_FILE_PATH=your-main-file.json
+JSON_SCHEMA_FILE_PATH=your-schema.json
+```
 
 ### Example Files
 

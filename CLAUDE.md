@@ -1,6 +1,6 @@
 ## Overview
 
-This is a Python FastAPI server that wraps jq queries over large JSON files and exposes them as an MCP (Model Context Protocol) compatible API. The server provides endpoints for querying JSON data using jq expressions and retrieving JSON schemas to assist with LLM reasoning.
+This is a Python MCP (Model Context Protocol) server that wraps jq queries over large JSON files. The server provides MCP tools for querying JSON data using jq expressions and retrieving JSON schemas to assist with LLM reasoning.
 
 ## Mandatory Context Loading
 
@@ -17,12 +17,9 @@ Once you have read and understand these documents, say "I have read the mandator
 
 ### Core Components
 
-- **server.py**: Main FastAPI application with three primary endpoints:
-  - `/query-json`: Executes jq queries against JSON files using subprocess calls
-  - `/get-schema`: Retrieves JSON schema files to assist with data structure understanding
-  - `/list-tools`: Returns MCP tool definitions for integration with LLM agents
-  - `/health`: Basic health check endpoint
-- **mcp_server.py**: Main MCP server application
+- **mcp_server.py**: Main MCP server application providing two MCP tools:
+  - `query_json`: Executes jq queries against JSON files using subprocess calls
+  - `get_jsonschema`: Retrieves JSON schema files to assist with data structure understanding
 
 ### Data Structure
 
@@ -31,47 +28,33 @@ Once you have read and understand these documents, say "I have read the mandator
 
 ## Common Development Commands
 
-### Docker Operations
-```bash
-# Build the Docker image
-docker build -t jq-mcp-server .
-
-# Run the container with data volume mounted
-docker run -p 8000:8000 -v /path/to/json/files:/data jq-mcp-server
-
-# Quick run with local data directory (from Makefile)
-make docker-run
-```
-
 ### Local Development
 ```bash
 # Install dependencies
 pip install -r requirements.txt
 
-# Run the server locally
-uvicorn server:app --host 0.0.0.0 --port 8000
+# Run the MCP server
+python mcp_server.py
 
-# Run with auto-reload for development
-uvicorn server:app --reload
+# Or with environment variables
+DATA_PATH=/path/to/data JSON_FILE_PATH=main.json python mcp_server.py
 ```
 
 ## Security Considerations
 
 - The server executes jq commands via subprocess, which requires careful handling of file paths
-- JSON files are accessed directly from the filesystem, so proper volume mounting and path validation is critical
-- The `/get-schema` endpoint reads arbitrary files from the filesystem - ensure proper access controls
+- JSON files are accessed directly from the filesystem, so proper path validation is critical
+- The `get_jsonschema` tool reads arbitrary files from the filesystem - ensure proper access controls
 
 ## MCP Integration
 
 The server exposes two MCP tools:
-1. **query-json**: For running jq expressions against JSON files
-2. **get-jsonschema**: For retrieving schema files to help with data structure understanding
+1. **query_json**: For running jq expressions against JSON files
+2. **get_jsonschema**: For retrieving schema files to help with data structure understanding
 
-The `/list-tools` endpoint provides the tool definitions that MCP-compatible agents can use to interact with the server.
+The server is compatible with MCP clients like Claude Desktop, VS Code, and other MCP-compatible agents.
 
 ## Dependencies
 
-- **FastAPI**: Web framework
-- **Pydantic**: Data validation and settings management
-- **uvicorn**: ASGI web server
-- **jq**: Command-line JSON processor (installed in Docker container)
+- **mcp**: MCP Python SDK for server implementation
+- **jq**: Command-line JSON processor (system dependency)

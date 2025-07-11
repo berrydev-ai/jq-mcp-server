@@ -24,4 +24,4 @@ if [ -z "$JSON_SCHEMA_FILE_PATH" ]; then
 fi
 
 source .venv/bin/activate && \
-  uvicorn server:app --host "0.0.0.0" --port 8000 --workers 1 --timeout-keep-alive 60
+  python mcp_server.py
