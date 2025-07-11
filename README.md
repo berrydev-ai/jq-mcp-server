@@ -35,9 +35,13 @@ Now supports **optional JSON Schema retrieval** for enhanced LLM agent context!
     ```
 2. **Build the Docker image:**
     ```bash
-    docker build -t jq-mcp-server .
+    make build
     ```
 3. **Run the server (mount your data directory):**
+    ```bash
+    make run DATA_PATH=/absolute/path/to/json/files
+    ```
+    Or using Docker directly:
     ```bash
     docker run -p 8000:8000 -v /absolute/path/to/json/files:/data jq-mcp-server
     ```
@@ -60,9 +64,13 @@ Now supports **optional JSON Schema retrieval** for enhanced LLM agent context!
     ```
 2. **Build the Docker image:**
     ```powershell
-    docker build -t jq-mcp-server .
+    make build
     ```
 3. **Run the server (adjust data path):**
+    ```powershell
+    make run DATA_PATH=C:/Users/YourName/data
+    ```
+    Or using Docker directly:
     ```powershell
     docker run -p 8000:8000 -v C:/Users/YourName/data:/data jq-mcp-server
     ```
@@ -173,6 +181,22 @@ curl http://localhost:8000/list-tools
 - Python 3.12, FastAPI, Docker
 - All endpoints are defined in `server.py`
 - Easy to extend with new tools
+
+### Local Development Scripts
+
+- **run.sh**: Runs the server locally with virtual environment activation
+- **dev.sh**: Runs the server in development mode with auto-reload
+
+### Makefile Commands
+
+- `make build`: Build the Docker image
+- `make run`: Run the Docker container (use `DATA_PATH` to specify data directory)
+
+### Example Files
+
+The repository includes example files in the `data/` directory:
+- `example.json`: Sample JSON data for testing queries
+- `example-schema.json`: Sample JSON schema for testing schema retrieval
 
 ---
 

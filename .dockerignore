@@ -26,6 +26,7 @@ env/
 /data/
 # Allow example file for documentation
 !/data/example.json
+!/data/example-schema.json
 
 # Ignore macOS junk
 .DS_Store

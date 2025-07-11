@@ -63,5 +63,6 @@ docker-compose.override.yml
 
 # __local data or mounts__
 /data/
-# Allow example file for documentation
+# Allow example files for documentation
 !/data/example.json
+!/data/example-schema.json

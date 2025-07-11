@@ -9,27 +9,39 @@ class QueryRequest(BaseModel):
     filePath: str
     query: str
 
-class SchemaRequest(BaseModel):
-    schemaPath: str
-
-class JqResponse(BaseModel):
+class QueryResponse(BaseModel):
     result: str
     query: str
     duration: float
 
+class SchemaRequest(BaseModel):
+    schemaPath: str
+
+class SchemaResponse(BaseModel):
+    result: dict
+    duration: float
+
+
 @app.post(
     "/query-json",
-    response_model=JqResponse,
+    response_model=QueryResponse,
     openapi_extra={
         "requestBody": {
             "content": {
                 "application/json": {
                     "examples": {
-                        "example": {
-                            "summary": "User names over 25",
+                        "docker-example": {
+                            "summary": "User names over 25 (docker)",
                             "value": {
                               "filePath": "/data/example.json",
                               "query": ".users[] | select(.age > 25) | .name"
+                            },
+                        },
+                        "eberry-example": {
+                            "summary": "User names over 25 (eberry)",
+                            "value": {
+                                "filePath": "/Users/eberry/github.com/berrydev-ai/jq-mcp-server/data/example.json",
+                                "query": ".users[] | select(.age > 25) | .name"
                             },
                         },
                     }
@@ -56,7 +68,7 @@ def query_json(req: QueryRequest):
         )
         duration = time.time() - start
 
-        return JqResponse(
+        return QueryResponse(
             result=result.decode().strip(),
             query=req.query,
             duration=duration
@@ -66,6 +78,7 @@ def query_json(req: QueryRequest):
 
 
 @app.post("/get-schema",
+    response_model=SchemaResponse,
     openapi_extra={
         "requestBody": {
             "content": {
@@ -91,6 +104,11 @@ def query_json(req: QueryRequest):
 )
 def get_schema(req: SchemaRequest):
     try:
+        import json
+        import time
+
+        start = time.time()
+
         with open(req.schemaPath, "r") as f:
             schema_content = f.read()
 
@@ -98,12 +116,15 @@ def get_schema(req: SchemaRequest):
         if not schema_str:
             raise HTTPException(status_code=400, detail="Schema file is empty.")
 
-        # Validate JSON schema format
-        import json
-
         try:
             schema_json = json.loads(schema_str)
-            return {"schema": schema_json}
+            duration = time.time() - start
+
+            return SchemaResponse(
+                result=schema_json,
+                duration=duration
+            )
+
         except json.JSONDecodeError as e:
             raise HTTPException(status_code=400, detail=f"Invalid JSON schema: {str(e)}")
 
